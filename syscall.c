@@ -7,6 +7,9 @@
 #include "x86.h"
 #include "syscall.h"
 
+
+int readcount = 0; // Defining a global read count.
+
 // User code makes a system call with INT T_SYSCALL.
 // System call number in %eax.
 // Arguments on the stack, from the user call to the C
@@ -103,6 +106,7 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
+extern int sys_getreadcount(void); //my chnage
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -126,6 +130,33 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_getreadcount] sys_getreadcount,
+};
+
+// Created an array of system call names in the same order with syscall.h.
+// So when we call it with eax - 1 it will give us the syscall name
+const char* syscallnames[] = {
+    "fork",
+    "exit",
+    "wait",
+    "pipe",
+    "read",
+    "kill",
+    "exec",
+    "fstat",
+    "chdir",
+    "dup",
+    "getpid",
+    "sbrk",
+    "sleep",
+    "uptime",
+    "open",
+    "write",
+    "mknod",
+    "unlink",
+    "link",
+    "mkdir",
+    "close"
 };
 
 void
@@ -135,6 +166,15 @@ syscall(void)
   struct proc *curproc = myproc();
 
   num = curproc->tf->eax;
+
+  if (num==SYS_read){
+    readcount++; // Increasing readid by one.
+  }
+
+  if (num==SYS_getreadcount){
+    curproc->readid = readcount; //my change
+  }
+
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     curproc->tf->eax = syscalls[num]();
   } else {
@@ -142,4 +182,6 @@ syscall(void)
             curproc->pid, curproc->name, num);
     curproc->tf->eax = -1;
   }
+// Task 1.B
+//  cprintf("%s -> %d : call %d\n", syscallnames[num-1], num, indicator);
 }

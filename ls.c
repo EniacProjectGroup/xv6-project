@@ -25,6 +25,9 @@ fmtname(char *path)
 void
 ls(char *path)
 {
+
+    printf(1,"Before read count: %d\n", getreadcount());
+
   char buf[512], *p;
   int fd;
   struct dirent de;
@@ -68,6 +71,8 @@ ls(char *path)
     break;
   }
   close(fd);
+
+    printf(1,"After read count: %d\n", getreadcount());
 }
 
 int

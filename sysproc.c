@@ -7,6 +7,13 @@
 #include "mmu.h"
 #include "proc.h"
 
+// Takes no arguments and returns an int.
+int
+sys_getreadcount(void)
+{
+  return myproc()->readid;
+}
+
 int
 sys_fork(void)
 {
