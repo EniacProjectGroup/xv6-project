@@ -183,5 +183,5 @@ syscall(void)
     curproc->tf->eax = -1;
   }
 // Task 1.B
- cprintf("%s -> %d\n", syscallnames[num-1], curproc->tf->eax);
+//  cprintf("%s -> %d\n", syscallnames[num-1], curproc->tf->eax);
 }
