@@ -8,7 +8,7 @@ The xv6 kernel is a simple, Unix-like teaching operating system developed by MIT
 ### Installation
 - To build the kernel we used QEMU within Ubuntu 22.04.
 
-### Acknowledgements
+### About The Project
 - We implemented each task in a new branch created from master branch.
   
 - This project was developed as part of the Eniac Project Group for the SENG305 course, under the guidance of <b>Asst. Prof. Dr. Rasha Osman</b>. The team consists of <b>Musa Yüksel</b>, <b>Rojda Süslü</b> and <b>Sena Dilan Çakır</b>.
