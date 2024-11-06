@@ -6,8 +6,9 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "pstat.h"
 
-struct {
+struct {  
   struct spinlock lock;
   struct proc proc[NPROC];
 } ptable;
@@ -89,7 +90,8 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
 
-  p->readid = 0; // Initialized readid to 0
+  p->tickets = 1; // By default each process has 1 tickets
+  p->ticks = 0; // By default each process has 0 ticks
 
   release(&ptable.lock);
 
@@ -201,6 +203,8 @@ fork(void)
   np->sz = curproc->sz;
   np->parent = curproc;
   *np->tf = *curproc->tf;
+
+  np->tickets = curproc->tickets;  // Inherit the parent's tickets
 
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
@@ -327,30 +331,45 @@ scheduler(void)
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
-  
+
   for(;;){
     // Enable interrupts on this processor.
     sti();
+
+    
+    int tickets_passed = 0;
+    int totalTickets = 0;
+
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->state != RUNNABLE)
+        continue;
+      totalTickets = totalTickets + p->tickets;  
+    }
+
+    long winner = random_at_most(totalTickets);
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
-
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
+      tickets_passed += p->tickets;
+      if(tickets_passed<winner){
+        continue;
+      }
+      
       c->proc = p;
       switchuvm(p);
       p->state = RUNNING;
-
-      swtch(&(c->scheduler), p->context);
+      swtch(&(c->scheduler), c->proc->context);
       switchkvm();
+      
+      p->ticks++;
 
       // Process is done running for now.
       // It should have changed its p->state before coming back.
       c->proc = 0;
+      break;
     }
     release(&ptable.lock);
 
@@ -533,4 +552,28 @@ procdump(void)
     }
     cprintf("\n");
   }
+}
+
+int
+getpinfo(struct pstat *p) 
+{
+  struct proc *proc;
+  int i = 0;
+
+  acquire(&ptable.lock);  // Lock to ensure consistency
+
+  for (proc = ptable.proc; proc < &ptable.proc[NPROC]; proc++) {
+    if (proc->state != UNUSED) {
+      p->inuse[i] = 1;
+      p->pid[i] = proc->pid;
+      p->tickets[i] = proc->tickets; 
+      p->ticks[i] = proc->ticks;
+    } else {
+      p->inuse[i] = 0;
+    }
+    i++;
+  }
+
+  release(&ptable.lock);  // Release the lock
+  return 0;
 }

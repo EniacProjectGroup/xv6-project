@@ -106,7 +106,8 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
-extern int sys_getreadcount(void); //my chnage
+extern int sys_settickets(void);
+extern int sys_getpinfo(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -130,7 +131,8 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-[SYS_getreadcount] sys_getreadcount,
+[SYS_settickets] sys_settickets,
+[SYS_getpinfo] sys_getpinfo,
 };
 
 // Created an array of system call names in the same order with syscall.h.
@@ -167,14 +169,6 @@ syscall(void)
 
   num = curproc->tf->eax;
 
-  if (num==SYS_read){
-    readcount++; // Increasing readid by one.
-  }
-
-  if (num==SYS_getreadcount){
-    curproc->readid = readcount; //my change
-  }
-
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     curproc->tf->eax = syscalls[num]();
   } else {
@@ -182,6 +176,4 @@ syscall(void)
             curproc->pid, curproc->name, num);
     curproc->tf->eax = -1;
   }
-// Task 1.B
-//  cprintf("%s -> %d\n", syscallnames[num-1], curproc->tf->eax);
 }

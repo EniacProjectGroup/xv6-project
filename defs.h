@@ -1,3 +1,5 @@
+#include "pstat.h"
+
 struct buf;
 struct context;
 struct file;
@@ -120,6 +122,8 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
+int             getpinfo(struct pstat *p);
+
 
 // swtch.S
 void            swtch(struct context**, struct context*);
@@ -185,6 +189,9 @@ void            switchuvm(struct proc*);
 void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
+
+// random.c
+long            random_at_most(long max);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

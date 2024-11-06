@@ -6,13 +6,7 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
-
-// Takes no arguments and returns an int.
-int
-sys_getreadcount(void)
-{
-  return myproc()->readid;
-}
+#include "pstat.h"
 
 int
 sys_fork(void)
@@ -95,4 +89,33 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+int
+sys_settickets(void)
+{
+  int number;
+
+  if (argint(0, &number) < 0 || number < 1) {
+    return -1;
+  }
+
+  // Update the tickets of the current process
+  struct proc *curproc = myproc();
+  curproc->tickets = number;
+
+  return 0;
+}
+
+int
+sys_getpinfo(void)
+{
+  struct pstat *p;
+  
+  // Get the argument and check if it's valid
+  if (argptr(0, (void*)&p, sizeof(*p)) < 0)
+    return -1;
+  
+  return getpinfo(p);
+
 }
