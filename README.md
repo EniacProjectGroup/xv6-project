@@ -43,7 +43,7 @@ We basically followed this tutorial to create a new system call https://www.geek
     #define SYS_getreadcount 22
 
 //syscall.c
-    extern int sys_getreadcount(void); //my chnage
+    extern int sys_getreadcount(void); //my change
     .
     .
     .
