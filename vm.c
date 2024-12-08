@@ -385,10 +385,38 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   return 0;
 }
 
-//PAGEBREAK!
-// Blank page.
-//PAGEBREAK!
-// Blank page.
-//PAGEBREAK!
-// Blank page.
+int mprotect(void *addr, int len)
+{
+  struct proc *curproc = myproc();
+  pte_t *pte ;
 
+
+  char *address =(char *)PGROUNDDOWN((uint)addr);
+  char *end =(char *)PGROUNDDOWN((uint)addr + len - 1);
+  for ( ; address < end ; address += PGSIZE) {
+    if ((pte = (pte_t *) walkpgdir(curproc->pgdir, (void *)address , 0)) == 0 || (*pte & PTE_P) == 0 )
+    {
+      return -1;
+    }
+    *pte &= ~PTE_W;
+  }
+  lcr3(V2P(curproc->pgdir));
+  return 0;
+}
+int munprotect(void *addr, int len)
+{
+  struct proc *curproc = myproc();
+  pte_t *pte ;
+
+  char *address =(char *)PGROUNDDOWN((uint)addr);
+  char *end =(char *)PGROUNDDOWN((uint)addr + len - 1);
+  for ( ; address < end ; address += PGSIZE) {
+    if ((pte = (pte_t *) walkpgdir(curproc->pgdir, (void *)address , 0)) == 0 || (*pte & PTE_P) == 0 ) 
+    {
+      return -1;
+    }
+    *pte |= PTE_W;
+  }
+  lcr3(V2P(curproc->pgdir));
+  return 0;
+}
