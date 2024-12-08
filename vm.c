@@ -389,13 +389,19 @@ int mprotect(void *addr, int len)
 {
   struct proc *curproc = myproc();
   pte_t *pte ;
-
+  pde_t *pde ;
 
   char *address =(char *)PGROUNDDOWN((uint)addr);
-  char *end =(char *)PGROUNDDOWN((uint)addr + len - 1);
-  for ( ; address < end ; address += PGSIZE) {
-    if ((pte = (pte_t *) walkpgdir(curproc->pgdir, (void *)address , 0)) == 0 || (*pte & PTE_P) == 0 )
-    {
+
+  for ( ; len > 0 ; address += PGSIZE , len--) {
+    pde = &curproc->pgdir[PDX(address)];
+    if (!(*pde & PTE_P)) {
+      // Page table not present, cannot change permissions
+      return -1;
+    }
+    pte = &((pte_t *)P2V(PTE_ADDR(*pde)))[PTX(address)];
+    if (!(*pte & PTE_P)) {
+      // Page not present, cannot change permissions
       return -1;
     }
     *pte &= ~PTE_W;
@@ -403,16 +409,24 @@ int mprotect(void *addr, int len)
   lcr3(V2P(curproc->pgdir));
   return 0;
 }
+
 int munprotect(void *addr, int len)
 {
   struct proc *curproc = myproc();
   pte_t *pte ;
+  pde_t *pde ;
 
   char *address =(char *)PGROUNDDOWN((uint)addr);
   char *end =(char *)PGROUNDDOWN((uint)addr + len - 1);
-  for ( ; address < end ; address += PGSIZE) {
-    if ((pte = (pte_t *) walkpgdir(curproc->pgdir, (void *)address , 0)) == 0 || (*pte & PTE_P) == 0 ) 
-    {
+  for ( ; len > 0 ; address += PGSIZE , len--) {
+    pde = &curproc->pgdir[PDX(address)];
+    if (!(*pde & PTE_P)) {
+      // Page table not present, cannot change permissions
+      return -1;
+    }
+    pte = &((pte_t *)P2V(PTE_ADDR(*pde)))[PTX(address)];
+    if (!(*pte & PTE_P)) {
+      // Page not present, cannot change permissions
       return -1;
     }
     *pte |= PTE_W;
