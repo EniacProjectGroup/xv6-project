@@ -417,7 +417,7 @@ int munprotect(void *addr, int len)
   pde_t *pde ;
 
   char *address =(char *)PGROUNDDOWN((uint)addr);
-  char *end =(char *)PGROUNDDOWN((uint)addr + len - 1);
+  
   for ( ; len > 0 ; address += PGSIZE , len--) {
     pde = &curproc->pgdir[PDX(address)];
     if (!(*pde & PTE_P)) {
