@@ -7,7 +7,7 @@ In this task we are expected implement exception handling for derefrences for nu
 
 #### Preventing null pointer dereference
 
-First thing we have done testing null dereference testing. In order to do that we created a basic user level program which dereferences a null pointer and run it.
+First thing we have done was testing null dereference testing. In order to do that we created a basic user level program which dereferences a null pointer and run it.
 ```C
 
 //null.c
