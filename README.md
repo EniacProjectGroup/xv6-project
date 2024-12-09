@@ -1,4 +1,4 @@
-# Task 2 Lottery Scheduler
+# Task 4 Virtual Memory Implementation
 
 ### Task Content
 In this task we are expected implement exception handling for derefrences for null pointers and ability to change the protection levels of some pages in a process's address space.
