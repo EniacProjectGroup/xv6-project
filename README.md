@@ -15,4 +15,6 @@ The xv6 kernel is a simple, Unix-like teaching operating system developed by MIT
   
 ### Completed Tasks
 - [Task 1: System Calls](https://github.com/EniacProjectGroup/xv6-project/tree/task-one)
-- [Task 2: Lottery Scheduler](https://github.com/EniacProjectGroup/xv6-project/tree/lottery-schedule)
+- [Task 2: Lottery Scheduler](https://github.com/EniacProjectGroup/xv6-project/tree/task-two)
+- [Task 3: Threads](https://github.com/EniacProjectGroup/xv6-project/tree/task-three)
+- [Task 4: Virtual Memory](https://github.com/EniacProjectGroup/xv6-project/tree/task-four)
