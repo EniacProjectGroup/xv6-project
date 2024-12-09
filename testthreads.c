@@ -44,7 +44,7 @@ main(int argc, char *argv[])
   thread_join();
   thread_join();
   arg1 = 0;
-  printf(1, "below should be a jarbled mess:\n");
+  printf(1, "below should be printed concurrently:\n");
   thread_create(&f1, (void *)&arg1, (void *)&arg2);
   thread_create(&f2, (void *)&arg1, (void *)&arg2);
   thread_create(&f3, (void *)&arg1, (void *)&arg2);
