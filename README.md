@@ -312,6 +312,4 @@ This screenshot is our outcome from the above tests.
 
 #### Conclusion
 
-In this project, we enhanced xv6's virtual memory by implementing null-pointer dereference protection and dynamic memory protection with mprotect and munprotect. These changes improve system robustness and memory safety by preventing invalid access and allowing user programs to enforce read-only memory for critical regions.
-
-The implementation required modifying page tables, handling edge cases, and ensuring updates were reflected in the hardware. By inheriting these protections during fork, we maintained consistency in multi-process environments. This project deepened our understanding of virtual memory management and system-level programming.
+In this project, we enhanced xv6's virtual memory by implementing null-pointer dereference protection and dynamic memory protection with mprotect and munprotect. These changes improve memory safety by preventing invalid access and allowing user programs to enforce read-only memory for critical regions.
