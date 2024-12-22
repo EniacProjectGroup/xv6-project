@@ -1,7 +1,9 @@
 # Task 2 Lottery Scheduler
 
+## Task 2.A
+
 ### Task Content
-In this task we are expected to implement lottery scheduler. Lottery Scheduling is a type of process scheduling, somewhat different from other Scheduling. Processes are scheduled in a random manner. Lottery scheduling can be preemptive or non-preemptive. It also solves the problem of starvation. Giving each process at least one lottery ticket guarantees that it has a non-zero probability of being selected at each scheduling operation.
+In this task we are expected to implement lottery scheduler. Lottery Scheduling is a type of process scheduling. Lottery schudiling is different from other scheduling methods. Processes are scheduled in a random manner. Lottery scheduling can be preemptive or non-preemptive.It also solves the problem of starvation by giving each process at least one lottery ticket and guarantees that it has a non-zero probability of being selected at each scheduling operation.
 
 ### Implementation
 
@@ -367,7 +369,7 @@ long            random_at_most(long max);
 ```
 
 #### Configuring The Scheduler
-In the scheduler function we basically loop through all runnable processes and sum up the total ticket count to get a random ticket and _continue_ until we have the process. 
+In the scheduler function we basically loop through all runnable processes and sum up the total ticket count to get a random ticket and _continue_ until we have the process. When we get the process which will run, we incremented the ticks it has.
 
 ```C
 //proc.c
@@ -425,19 +427,47 @@ In the scheduler function we basically loop through all runnable processes and s
     }
 ```
 
-#### Graph (_Conceptual_)
+#### Graph
 A conceptual graph is satisfied as requested in project documentation.
 
 ![graph](https://imgur.com/ycYuZ31.png)
 
+As it can be seen in the graph when we have 3:2:1 it is hard to see the effect  of lottery scheduler for a little time slice at the beginning but when we see all time slices since the probablities of processes to run are in 3:2:1 ratio the process with 3 tickets will be executed more than others.
+
 #### Conclusion
 
-The lottery scheduler provides a probabilistic fairness model. Processes with more tickets tend to get more CPU time, while those with fewer tickets get less but are not completely neglected. This setup allows for some flexibility in prioritizing processes without hard guarantees on exact slice counts per cycle.
+The lottery scheduler provides a probabilistic fairness model. Processes with more tickets has more probablity to get more CPU time. In lottery scheduler less tickets has the probablity to get less CPU time but are not completely neglected. This setup allows operating system to prioritize processes without hard guarantees on exact slice counts per cycle.
 
-However, randomness can sometimes cause slight irregularities in time slice distribution, particularly over short observation windows. This was evident in the graph where, occasionally, the process with fewer tickets still got CPU time due to random selection. Over time, though, the scheduler consistently reflects the ticket ratio distribution.
 
 These are some results we got with ps. Randomness is mostly visible.
 
 ![res1](https://imgur.com/nJM3gga.png)
 
 ![res2](https://imgur.com/3ifYTg5.png)
+
+## Task 2.B
+
+### Task Content
+In this task we are expected to what we can do to prevent starvation in a scenerio where tickets are not chosen random or fairly.
+
+#### Understanding The Problem
+In lottery scheduler, processes are assigned tickets, and the process with the highest number of tickets has the most posibility to get selected by scheduler. In a scenario where processes are not selected randomly or fairly, they might not get CPU time because they have fewer tickets or are passed over too many times. So it will lead to starvation.
+
+#### Choosing A Solution
+
+To prevent starvation we found a technique called Ticket Aging can be implemented. This mechanism ensures that processes which have been waiting longer are given a higher chance of being selected.
+
+#### Ticket Aging
+**Tracking Wait Time:**  Every process has a wait time counter that which is incremented each time the process is not selected. The longer a process waits for being selected, the higher its wait time becomes.
+
+
+**Increasing Ticket Count Over Time:**  When wait time of a process increases, it gets more tickets. This boost in ticket count increases the probablity of the process being selected for the next time. It ensures that processes with fewer tickets but longer wait times are eventually prioritized.
+
+
+**Decay of Boosted Tickets:**  Once a process is selected, its extra tickets are reset to the original number. This prevents a process from permenantly holding more tickets. So, the system avoids giving unfair long-term advantage to any process.
+
+#### Conclusion
+Randomness is essential in lottery schuduler but in a sceneraio we don't have randomness we can still fix starvation with mechanisms like ticket aging.
+
+Ticket aging balances trade-off between fairness and prioritization. By periodically increasing the ticket count for long-waiting processes, the system ensures that every process gets a fair share of CPU time over the long term, without any process has a starvation.
+
